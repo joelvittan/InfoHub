@@ -83,7 +83,9 @@ export default function Home() {
       {tabs.map((tab, index) => (
         <section
           key={tab.id}
-          ref={(el) => (sectionRefs.current[index] = el)}
+          ref={(el) => {
+            sectionRefs.current[index] = el
+          }}
           data-id={tab.id}
           className={`snap-start min-h-screen flex flex-col justify-center items-center bg-gradient-to-br ${tab.bgGradient} transition-all duration-700 px-4 sm:px-6 md:px-10`}
         >
