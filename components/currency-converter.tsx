@@ -75,7 +75,7 @@ export default function CurrencyConverter() {
               className="group px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-amber-500/30 transform hover:-translate-y-1 drop-shadow-md"
             >
               <span className="group-hover:scale-110 transition-transform duration-300 inline-block">
-                {isLoading ? "⏳" : "🔄"}
+                {isLoading ? "Loading" : ""}
               </span>
               {isLoading ? "..." : "Convert"}
             </button>

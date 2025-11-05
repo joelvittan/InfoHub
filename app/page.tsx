@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import WeatherModule from "@/components/weather-module"
 import CurrencyConverter from "@/components/currency-converter"
 import QuoteGenerator from "@/components/quote-generator"
@@ -9,104 +9,107 @@ type TabType = "weather" | "currency" | "quote"
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("weather")
+  const sectionRefs = useRef<(HTMLElement | null)[]>([])
 
-  const tabs: { id: TabType; label: string; icon: string; bgGradient: string }[] = [
-    { id: "weather", label: "Weather", icon: "🌤", bgGradient: "from-blue-600 via-purple-600 to-pink-600" },
-    { id: "currency", label: "Currency", icon: "💱", bgGradient: "from-amber-600 via-orange-600 to-red-600" },
-    { id: "quote", label: "Quotes", icon: "💭", bgGradient: "from-purple-600 via-pink-600 to-blue-600" },
+  const tabs: { id: TabType; label: string; bgGradient: string; description: string }[] = [
+    {
+      id: "weather",
+      label: "Weather",
+      bgGradient: "from-blue-600 via-indigo-600 to-purple-600",
+      description: "Get the latest weather information from around the world.",
+    },
+    {
+      id: "currency",
+      label: "Currency Converter",
+      bgGradient: "from-amber-500 via-orange-600 to-red-600",
+      description: "Convert currencies in real-time instantly.",
+    },
+    {
+      id: "quote",
+      label: "Quotes",
+      bgGradient: "from-fuchsia-600 via-pink-600 to-sky-600",
+      description: "Get motivational quotes from famous people.",
+    },
   ]
 
-  const backgroundGradient =
-    tabs.find((tab) => tab.id === activeTab)?.bgGradient || "from-blue-600 via-purple-600 to-pink-600"
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          console.log(entry)
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("data-id") as TabType
+            if (id) setActiveTab(id)
+          }
+        })
+      },
+      { threshold: 0.6 }
+    )
+
+    sectionRefs.current.forEach((section) => {
+      if (section) observer.observe(section)
+    })
+
+    return () => {
+      sectionRefs.current.forEach((section) => {
+        if (section) observer.unobserve(section)
+      })
+    }
+  }, [])
+
+  const scrollToSection = (index: number) => {
+    const section = sectionRefs.current[index]
+    if (section) section.scrollIntoView({ behavior: "smooth" })
+  }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${backgroundGradient} transition-all duration-1000 ease-out`}>
-      <div className="fixed inset-0 opacity-30">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 to-transparent"></div>
-      </div>
+    <div className="relative snap-y snap-mandatory h-screen overflow-y-scroll scroll-smooth">
+      <nav className="fixed top-3 left-1/2 -translate-x-1/2 z-50 flex gap-2 md:gap-4 lg:gap-6 bg-white/10 backdrop-blur-lg border border-white/20 rounded-full px-3 py-2 md:px-6 shadow-lg overflow-x-auto whitespace-nowrap max-w-[90vw] md:max-w-none">
+        {tabs.map((tab, index) => (
+          <button
+            key={tab.id}
+            onClick={() => scrollToSection(index)}
+            className={`px-3 py-1.5 md:px-4 md:py-1.5 rounded-full font-semibold text-xs sm:text-sm md:text-base transition-all duration-300 
+              ${activeTab === tab.id
+                ? "bg-white text-gray-800 shadow-lg scale-105"
+                : "text-white/80 hover:text-white hover:bg-white/20"}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
-      </div>
+      {/* Sections */}
+      {tabs.map((tab, index) => (
+        <section
+          key={tab.id}
+          ref={(el) => (sectionRefs.current[index] = el)}
+          data-id={tab.id}
+          className={`snap-start min-h-screen flex flex-col justify-center items-center bg-gradient-to-br ${tab.bgGradient} transition-all duration-700 px-4 sm:px-6 md:px-10`}
+        >
+          <main className="relative flex flex-col items-center justify-center text-center px-4 sm:px-6 md:px-10 py-12 md:py-20 w-full">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold text-white mb-3 tracking-tight drop-shadow-lg">
+              {tab.label}
+            </h1>
+            <p className="text-white/80 mb-8 sm:mb-10 text-sm sm:text-base md:text-lg max-w-md sm:max-w-lg md:max-w-xl leading-relaxed">
+              {tab.description}
+            </p>
 
-      <main className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-2xl">
-          <div className="text-center mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight drop-shadow-lg">InfoHub</h1>
-            <p className="text-white/80 text-lg drop-shadow-md">Your daily utility companion</p>
-          </div>
-
-          <div className="flex gap-3 mb-10 justify-center flex-wrap animate-in fade-in slide-in-from-top-6 duration-700 animation-delay-100">
-            {tabs.map((tab, index) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`group px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${activeTab === tab.id
-                    ? "bg-white/20 text-white shadow-2xl shadow-white/20 backdrop-blur-md border border-white/30 scale-105"
-                    : "bg-white/10 text-white/80 hover:bg-white/15 backdrop-blur-sm border border-white/10 hover:border-white/20"
-                  }`}
-                style={{
-                  animation: `slideIn 0.5s ease-out ${index * 100}ms backwards`,
-                }}
-              >
-                <span className="mr-2 text-xl group-hover:scale-125 transition-transform duration-300 inline-block">
-                  {tab.icon}
-                </span>
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="animate-in fade-in duration-500 animation-delay-200">
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-8 md:p-10 border border-white/20 hover:border-white/30 transition-all duration-300 hover:shadow-2xl hover:shadow-white/10">
-              <div className="animate-in fade-in zoom-in duration-500">
-                {activeTab === "weather" && <WeatherModule />}
-                {activeTab === "currency" && <CurrencyConverter />}
-                {activeTab === "quote" && <QuoteGenerator />}
-              </div>
+            <div className="bg-white/15 backdrop-blur-2xl rounded-2xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/20 w-full max-w-sm sm:max-w-md md:max-w-xl hover:border-white/40 transition-all duration-300">
+              {tab.id === "weather" && <WeatherModule />}
+              {tab.id === "currency" && <CurrencyConverter />}
+              {tab.id === "quote" && <QuoteGenerator />}
             </div>
-          </div>
 
-        </div>
-      </main>
-
-      <style jsx>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        .animation-delay-100 {
-          animation-delay: 100ms;
-        }
-        .animation-delay-200 {
-          animation-delay: 200ms;
-        }
-        .animation-delay-300 {
-          animation-delay: 300ms;
-        }
-      `}</style>
+            {/* Scroll Hint */}
+            {index < tabs.length - 1 && (
+              <div className="absolute bottom-6 sm:bottom-10 animate-bounce text-white/80 text-xs sm:text-sm">
+                Scroll down to explore more
+              </div>
+            )}
+          </main>
+        </section>
+      ))}
     </div>
   )
 }

@@ -48,7 +48,7 @@ export default function QuoteGenerator() {
   if (error) {
     return (
       <div className="p-6 rounded-xl bg-red-500/20 border border-red-400/50 text-red-200 animate-in shake duration-500">
-        <p className="font-semibold">⚠️ Error: {error}</p>
+        <p className="font-semibold">Error: {error}</p>
       </div>
     )
   }
@@ -60,7 +60,7 @@ export default function QuoteGenerator() {
       <div
         className={`text-center space-y-5 transition-all duration-600 transform ${isFlipping ? "scale-95 opacity-50" : "scale-100 opacity-100"}`}
       >
-        <div className="text-5xl animate-in zoom-in duration-500">✨</div>
+        {/* <div className="text-5xl animate-in zoom-in duration-500"></div> */}
         <div className="bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/20 hover:border-white/30 transition-all duration-300 hover:shadow-lg hover:shadow-white/10">
           <blockquote className="text-2xl md:text-3xl font-bold text-white italic leading-relaxed drop-shadow-lg animate-in slide-in-from-top duration-500">
             "{quote.text}"
@@ -77,7 +77,7 @@ export default function QuoteGenerator() {
         className="group w-full px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-purple-500/30 transform hover:-translate-y-1 drop-shadow-md animate-in fade-in slide-in-from-bottom duration-500 animation-delay-300"
       >
         <span className="group-hover:scale-110 transition-transform duration-300 inline-block mr-2">
-          {isFlipping ? "🔄" : "✨"}
+          {isFlipping ? "Loading" : "↻"}
         </span>
         {isFlipping ? "Loading..." : "Get Another Quote"}
       </button>
